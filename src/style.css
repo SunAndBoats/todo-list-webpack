@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 2rem;
+    background: #f4f4f4;
+  }
+  
+  .app {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  #todo-form {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  #todo-list {
+    margin-top: 2rem;
+  }
+  
+  .todo-item {
+    background: #e0e0e0;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .todo-item:focus {
+    outline: 2px solid #2196f3;
+  }
+  
