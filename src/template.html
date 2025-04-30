@@ -1,19 +1,29 @@
+<!-- src/template.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Todo List</title>
+  <title>ToDo List</title>
 </head>
 <body>
   <div class="app">
     <h1>ToDo List</h1>
+
+    <div id="todo-list"></div>
+
+    <!-- NEW: Formulario movido debajo de la lista para crear nuevos todos -->
     <form id="todo-form">
-      <input type="text" id="todo-input" placeholder="Escribe una tarea..." required />
+      <input
+        type="text"
+        id="todo-input"
+        placeholder="Escribe una tarea..."
+        required
+      />
       <button type="submit">Añadir</button>
     </form>
-    <div id="todo-list"></div>
+    <!-- END NEW -->
+
   </div>
 </body>
 </html>
-
