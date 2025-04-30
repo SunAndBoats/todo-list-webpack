@@ -1,14 +1,27 @@
 // src/modules/TodoStorage.js
-const STORAGE_KEY = 'todos';
 
-export default class TodoStorage {
-  static load() {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    return data.map(text => new Todo(text));
+function loadTodos() {
+    try {
+      const data = localStorage.getItem('todos');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Error al cargar los todos:', error);
+      return [];
+    }
   }
-
-  static save(todos) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.map(t => t.text)));
+  
+  function saveTodos(todos) {
+    try {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    } catch (error) {
+      console.error('Error al guardar los todos:', error);
+    }
   }
-}
-import Todo from './Todo.js';
+  
+  const storage = {
+    load: loadTodos,
+    save: saveTodos
+  };
+  
+  export default storage;
+  

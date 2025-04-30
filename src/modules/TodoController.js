@@ -1,41 +1,72 @@
 // src/modules/TodoController.js
 import Todo from './Todo.js';
-import TodoStorage from './TodoStorage.js';
 import TodoView from './TodoView.js';
+import storage from './TodoStorage.js';
 
-export default class TodoController {
-  constructor() {
-    this.todos = TodoStorage.load();
-    this.list = document.getElementById('todo-list');
-    this.input = document.getElementById('todo-input');
-    this.form = document.getElementById('todo-form');
-    this.view = new TodoView(this.list, this.input, this.form);
-  }
+const TodoController = (() => {
+  let todos = storage.load();
+  let hideCompleted = false; // NEW: estado para ocultar completados
 
-  init() {
-    this.view.render(this.todos);
-    this.view.bindAdd(this.addTodo.bind(this));
-    this.view.bindEdit(this.editTodo.bind(this));
-    this.view.bindDelete(this.deleteTodo.bind(this));
-  }
+  const render = () => {
+    // Si está activo hideCompleted, filtramos
+    const filteredTodos = hideCompleted
+      ? todos.filter(todo => !todo.completed)
+      : todos;
 
-  addTodo(text) {
-    this.todos.push(new Todo(text));
-    this._update();
-  }
+    TodoView.render(filteredTodos, {
+      onEdit: (index, newText) => {
+        // OJO: usar el índice real en `todos`, no en `filteredTodos`
+        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
+        if (realIndex !== -1) {
+          todos[realIndex].text = newText;
+          storage.save(todos);
+        }
+      },
+      onDelete: (index) => {
+        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
+        if (realIndex !== -1) {
+          todos.splice(realIndex, 1);
+          storage.save(todos);
+          render();
+        }
+      },
+      onToggle: (index) => {
+        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
+        if (realIndex !== -1) {
+          todos[realIndex].completed = !todos[realIndex].completed;
+          storage.save(todos);
+          render();
+        }
+      }
+    });
+  };
 
-  editTodo(index, newText) {
-    this.todos[index].update(newText);
-    this._update();
-  }
+  const init = () => {
+    const form = document.getElementById('todo-form');
+    const input = document.getElementById('todo-input');
+    const toggleBtn = document.getElementById('toggle-completed'); // Botón de ocultar completados
 
-  deleteTodo(index) {
-    this.todos.splice(index, 1);
-    this._update();
-  }
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (text !== '') {
+        todos.push(new Todo(text));
+        storage.save(todos);
+        input.value = '';
+        render();
+      }
+    });
 
-  _update() {
-    TodoStorage.save(this.todos);
-    this.view.render(this.todos);
-  }
-}
+    toggleBtn.addEventListener('click', () => {
+      hideCompleted = !hideCompleted;
+      toggleBtn.textContent = hideCompleted ? 'Mostrar completados' : 'Ocultar completados';
+      render();
+    });
+
+    render();
+  };
+
+  return { init };
+})();
+
+export default TodoController;

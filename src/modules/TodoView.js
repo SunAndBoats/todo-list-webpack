@@ -1,55 +1,46 @@
 // src/modules/TodoView.js
 import { createElement } from './domHelpers.js';
 
-export default class TodoView {
-  constructor(listContainer, inputElement, formElement) {
-    this.listContainer = listContainer;
-    this.inputElement = inputElement;
-    this.formElement = formElement;
-  }
+function renderTodos(todos, { onEdit, onDelete, onToggle }) {
+  const list = document.getElementById('todo-list');
+  list.innerHTML = '';
 
-  bindAdd(handler) {
-    this.formElement.addEventListener('submit', e => {
-      e.preventDefault();
-      if (this.inputElement.value.trim()) {
-        handler(this.inputElement.value.trim());
-        this.inputElement.value = '';
-      }
+  todos.forEach((todo, index) => {
+    const div = createElement('div', {
+      className: 'todo-item' + (todo.completed ? ' completed' : ''),
     });
-  }
 
-  bindEdit(handler) {
-    this.listContainer.addEventListener('blur', e => {
-      if (e.target.classList.contains('todo-text')) {
-        const index = e.target.closest('.todo-item').dataset.index;
-        handler(index, e.target.textContent);
-      }
-    }, true);
-  }
-
-  bindDelete(handler) {
-    this.listContainer.addEventListener('click', e => {
-      if (e.target.classList.contains('delete-btn')) {
-        const index = e.target.closest('.todo-item').dataset.index;
-        handler(index);
-      }
+    const checkbox = createElement('input', {
+      type: 'checkbox',
+      checked: todo.completed,
+      onchange: () => onToggle(index),
     });
-  }
 
-  render(todos) {
-    this.listContainer.innerHTML = '';
-    todos.forEach((todo, i) => {
-      const item = createElement('div', 'todo-item', null, { 'data-index': i });
-      const span = createElement('span', 'todo-text');
-      span.contentEditable = true;
-      span.textContent = todo.text;
-
-      const del = createElement('button', 'delete-btn');
-      del.textContent = '✖';
-
-      item.appendChild(span);
-      item.appendChild(del);
-      this.listContainer.appendChild(item);
+    const span = createElement('span', {
+      className: 'todo-text',
+      textContent: todo.text,
+      onclick: () => {
+        const newText = prompt('Editar tarea:', todo.text);
+        if (newText !== null && newText.trim() !== '') {
+          onEdit(index, newText.trim());
+        }
+      },
     });
-  }
+
+    const del = createElement('button', {
+      textContent: 'Eliminar',
+      onclick: () => onDelete(index),
+    });
+
+    div.appendChild(checkbox);
+    div.appendChild(span);
+    div.appendChild(del);
+    list.appendChild(div);
+  });
 }
+
+const TodoView = {
+  render: renderTodos
+};
+
+export default TodoView;
