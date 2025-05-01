@@ -1,7 +1,15 @@
 // src/modules/TodoController.js
 import Todo from './Todo.js';
-import TodoView from './TodoView.js';
-import storage from './TodoStorage.js';
+import { renderTodos } from './TodoView.js';
+import { loadTodos, saveTodos } from './TodoStorage.js';
+
+
+
+/*
+import { renderTodos } from './TodoView.js';
+import { loadTodos, saveTodos } from './TodoStorage.js';
+
+*/
 
 const TodoController = (() => {
   let todos = storage.load();
@@ -56,6 +64,17 @@ const TodoController = (() => {
         render();
       }
     });
+    /*form.addEventListener('submit', (e) => {
+  e.preventDefault(); // Evita la recarga de la página
+  const text = input.value.trim();
+  if (text !== '') {
+    todos.push(new Todo(text));
+    storage.save(todos);
+    input.value = '';
+    render();
+  }
+});
+*/
 
     toggleBtn.addEventListener('click', () => {
       hideCompleted = !hideCompleted;
