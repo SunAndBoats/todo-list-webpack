@@ -1,80 +1,60 @@
 // src/modules/TodoController.js
+
 import Todo from './Todo.js';
-import { renderTodos } from './TodoView.js';
-import { loadTodos, saveTodos } from './TodoStorage.js';
+import { renderTodos } from './TodoView.js'; // Importamos la función por su nombre
+import { loadTodos, saveTodos } from './TodoStorage.js'; // Exportación nombrada de storage
+
+export const TodoController = (() => {
+  let todos = loadTodos().map(t => new Todo(t.text, t.completed, t.id));
 
 
-
-/*
-import { renderTodos } from './TodoView.js';
-import { loadTodos, saveTodos } from './TodoStorage.js';
-
-*/
-
-const TodoController = (() => {
-  let todos = storage.load();
-  let hideCompleted = false; // NEW: estado para ocultar completados
+  let hideCompleted = false;
 
   const render = () => {
-    // Si está activo hideCompleted, filtramos
     const filteredTodos = hideCompleted
       ? todos.filter(todo => !todo.completed)
       : todos;
 
-    TodoView.render(filteredTodos, {
-      onEdit: (index, newText) => {
-        // OJO: usar el índice real en `todos`, no en `filteredTodos`
-        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
-        if (realIndex !== -1) {
-          todos[realIndex].text = newText;
-          storage.save(todos);
-        }
-      },
-      onDelete: (index) => {
-        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
-        if (realIndex !== -1) {
-          todos.splice(realIndex, 1);
-          storage.save(todos);
+      renderTodos(filteredTodos, {
+        onEdit: (id, newText) => {
+          const todo = todos.find(t => t.id === id);
+          if (todo) {
+            todo.text = newText;
+            saveTodos(todos);
+          }
+        },
+        onDelete: (id) => {
+          todos = todos.filter(t => t.id !== id);
+          saveTodos(todos);
           render();
+        },
+        onToggle: (id) => {
+          const todo = todos.find(t => t.id === id);
+          if (todo) {
+            todo.completed = !todo.completed;
+            saveTodos(todos);
+            render();
+          }
         }
-      },
-      onToggle: (index) => {
-        const realIndex = todos.findIndex(t => t === filteredTodos[index]);
-        if (realIndex !== -1) {
-          todos[realIndex].completed = !todos[realIndex].completed;
-          storage.save(todos);
-          render();
-        }
-      }
-    });
+      });
+      
   };
 
   const init = () => {
     const form = document.getElementById('todo-form');
     const input = document.getElementById('todo-input');
-    const toggleBtn = document.getElementById('toggle-completed'); // Botón de ocultar completados
+    const toggleBtn = document.getElementById('toggle-completed');
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const text = input.value.trim();
       if (text !== '') {
         todos.push(new Todo(text));
-        storage.save(todos);
+        saveTodos(todos); // Usamos saveTodos
         input.value = '';
         render();
       }
     });
-    /*form.addEventListener('submit', (e) => {
-  e.preventDefault(); // Evita la recarga de la página
-  const text = input.value.trim();
-  if (text !== '') {
-    todos.push(new Todo(text));
-    storage.save(todos);
-    input.value = '';
-    render();
-  }
-});
-*/
 
     toggleBtn.addEventListener('click', () => {
       hideCompleted = !hideCompleted;
@@ -87,5 +67,3 @@ const TodoController = (() => {
 
   return { init };
 })();
-
-export default TodoController;

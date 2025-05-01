@@ -1,10 +1,11 @@
 // src/modules/TodoStorage.js
-const STORAGE_KEY = 'todos';
 
-export function loadTodos() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-}
+const loadTodos = () => {
+  return JSON.parse(localStorage.getItem('todos')) || [];
+};
 
-export function saveTodos(todos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-}
+const saveTodos = (todos) => {
+  localStorage.setItem('todos', JSON.stringify(todos));
+};
+
+export { loadTodos, saveTodos };  // Exportación nombrada de las funciones

@@ -1,9 +1,9 @@
+// src/index.js
+
 import './style.css';
-import TodoController from './modules/TodoController.js'; // ✅
-
-
+import { TodoController } from './modules/TodoController.js'; // Importación nombrada
 
 document.addEventListener('DOMContentLoaded', () => {
-  const controller = new TodoController();
-  controller.init();
+  TodoController.init();
+
 });
